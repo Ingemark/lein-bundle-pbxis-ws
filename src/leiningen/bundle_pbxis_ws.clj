@@ -13,11 +13,11 @@
     (print (:out res)) (print (:err res)) (flush)
     (when-not (zero? (:exit res)) (raise "Command failed with exit code %s: %s" (:exit res) args))))
 
-(defn bundle-pbxis-ws [project dest-name]
-  (let [dest (io/file dest-name)
-        tarfile (format "pbxis-ws-%s.tgz" (:version project))
+(defn bundle-pbxis-ws [project dest]
+  (let [tarfile (format "pbxis-ws-%s.tgz" (:version project))
         jarfile "pbxis-ws-standalone.jar"]
-    (when-not (.isDirectory dest) (raise "Destination %s is not a directory" dest-name))
+    (when-not (-> dest-name io/file .isDirectory)
+      (raise "Destination %s is not a directory" dest-name))
     (println "lein uberjar")
     (sh! "mv" (uberjar project) jarfile)
     (sh! "tar" "cvfz" tarfile
