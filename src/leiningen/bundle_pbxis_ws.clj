@@ -15,9 +15,10 @@
 
 (defn bundle-pbxis-ws [project dest]
   (let [tarfile (format "pbxis-ws-%s.tgz" (:version project))
-        jarfile "pbxis-ws-standalone.jar"]
-    (when-not (-> dest-name io/file .isDirectory)
-      (raise "Destination %s is not a directory" dest-name))
+        jarfile "pbxis-ws-standalone.jar"
+        dest (let [d (io/file dest)] (if (.isDirectory d)
+                                       (str (.getPath d) "/")
+                                       (raise "Destination %s is not a directory" dest)))]
     (println "lein uberjar")
     (sh! "mv" (uberjar project) jarfile)
     (sh! "tar" "cvfz" tarfile
