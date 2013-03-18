@@ -6,5 +6,6 @@
   :eval-in :leiningen
   :lein-release {:deploy-via :clojars}
 
-  :dependencies [[org.clojure/clojure "1.5.1"]])
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 [s3-wagon-private "1.1.2"]])
 
