@@ -25,7 +25,7 @@
         dest-name (if (.isDirectory dest)
                     (str (.getPath dest) "/")
                     (abort "Destination %s is not a directory" dest-name))]
-    (println "lein uberjar")
+    (println "$ lein uberjar")
     (sh! "mv" (uberjar project) jarfile)
     #_(sh! "touch" jarfile)
     (sh! "tar" "cvfz" tarfile
@@ -33,8 +33,8 @@
          "pbxis-config.clj.template"
          "logback.xml")
     (sh! "mv" tarfile dest-name)
-    (let [repo (second (leiningen.deploy/repo-for project "releases"))
-          repo-obj (Repository. "releases" (:url repo))]
+    (let [repo (second (leiningen.deploy/repo-for project "bundle"))
+          repo-obj (Repository. "bundle" (:url repo))]
       (println "Upload" tarfile "==>" (:url repo))
       (doto (.lookup (PomegranateWagonProvider.) (.getProtocol repo-obj))
         (.connect repo-obj (doto (AuthenticationInfo.)
