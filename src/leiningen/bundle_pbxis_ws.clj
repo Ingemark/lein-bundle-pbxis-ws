@@ -19,6 +19,7 @@
     (when-not (zero? (:exit res)) (abort "Command failed with exit code %s: %s" (:exit res) args))))
 
 (defn bundle-pbxis-ws
+  "Bundle the pbxis-ws project"
   ([project] (bundle-pbxis-ws project "."))
   ([project dest-name]
      (let [tgz-path (let [dest-dir (io/file dest-name)]
