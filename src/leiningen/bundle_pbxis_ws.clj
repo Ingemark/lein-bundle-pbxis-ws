@@ -18,35 +18,22 @@
     (print (:out res)) (print (:err res)) (flush)
     (when-not (zero? (:exit res)) (abort "Command failed with exit code %s: %s" (:exit res) args))))
 
-(defn bundle-pbxis-ws [project dest-name]
-  (let [tarfile (format "%s-%s.tgz" (:name project) (:version project))
-        jarfile "pbxis-ws-standalone.jar"
-        dest (io/file dest-name)
-        dest-name (if (.isDirectory dest)
-                    (str (.getPath dest) "/")
-                    (abort "Destination %s is not a directory" dest-name))]
-    (println "$ lein uberjar")
-    (sh! "mv" (uberjar project) jarfile)
-    #_(sh! "touch" jarfile)
-    (sh! "tar" "cvfz" tarfile
-         jarfile
-         "pbxis-config.clj.template"
-         "logback.xml")
-    (sh! "mv" tarfile dest-name)
-    (let [repo (second (leiningen.deploy/repo-for project "bundle"))
-          repo-obj (Repository. "bundle" (:url repo))]
-      (println "Upload" tarfile "==>" (:url repo))
-      (doto (.lookup (PomegranateWagonProvider.) (.getProtocol repo-obj))
-        (.connect repo-obj (doto (AuthenticationInfo.)
-                             (.setUserName (:username repo))
-                             (.setPassword (:password repo))
-                             (.setPassphrase (:passphrase repo))))
-        (.put (io/file dest tarfile) (str "bundle/" tarfile))))))
-
-#_(let [files {[(symbol (:group project) (:name project)) (:version project) :extension "tgz"]
-               tarfile}]
-    (aether/deploy-artifacts
-     :artifacts (keys files)
-     :files files
-     :transfer-listener :stdout
-     :repository [(leiningen.deploy/repo-for project "releases")]))
+(defn bundle-pbxis-ws
+  ([project] (bundle-pbxis-ws project "."))
+  ([project dest-name]
+     (let [tgz-path (let [dest-dir (io/file dest-name)]
+                      (if (.isDirectory dest-dir)
+                        (-> dest-dir
+                            (io/file (format "%s-%s.tgz" (:name project) (:version project)))
+                            .getPath)
+                        (abort "Destination %s is not a directory" dest-name)))
+           jarfile (do (println "$ lein uberjar") (io/file (uberjar project)))
+           moved-jarfile (io/file (.getName jarfile))
+           config-file (io/file "pbxis-config.clj")]
+       (.renameTo jarfile moved-jarfile)
+       (.renameTo (io/file "pbxis-config.clj.template") config-file)
+       (sh! "tar" "cvfz" tgz-path
+            (.getPath moved-jarfile)
+            (.getPath config-file)
+            "logback.xml")
+       tgz-path)))
