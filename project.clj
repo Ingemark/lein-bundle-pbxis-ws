@@ -1,4 +1,4 @@
-(defproject com.ingemark/lein-bundle-pbxis-ws "0.1.5"
+(defproject com.ingemark/lein-bundle-pbxis-ws "0.1.6-SNAPSHOT"
   :description "Creates a .tgz bundle of the pbxis-ws project"
   :url "https://github.com/Inge-mark/bundle-pbxis-ws"
   :license {:name "Eclipse Public License"
