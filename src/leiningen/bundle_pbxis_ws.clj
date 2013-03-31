@@ -36,5 +36,6 @@
        (sh! "tar" "cvfz" tgz-path
             (.getPath moved-jarfile)
             (.getPath config-file)
-            "logback.xml")
+            "logback.xml"
+            "README.md")
        tgz-path)))
