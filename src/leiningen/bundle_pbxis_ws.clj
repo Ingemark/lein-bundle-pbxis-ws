@@ -12,11 +12,11 @@
 
 (defn abort [fmt & args] (main/abort (apply format fmt args)))
 
-(defn sh! [& args]
-  (apply println "$" args)
-  (let [res (apply sh/sh args)]
-    (print (:out res)) (print (:err res)) (flush)
-    (when-not (zero? (:exit res)) (abort "Command failed with exit code %s: %s" (:exit res) args))))
+(defn sh! [& cmd]
+  (apply println "$" cmd)
+  (let [res (eval/sh cmd)]
+    (when-not (zero? res) (abort "Command failed with exit code %s: %s" res cmd))
+    res))
 
 (defn bundle-pbxis-ws
   "Bundle the pbxis-ws project"
